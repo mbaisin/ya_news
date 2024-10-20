@@ -17,6 +17,7 @@ def test_author_can_post_comment(
     new_comment = Comment.objects.get()
     assert new_comment.text == form_data['text']
     assert new_comment.author == author
+    assert new_comment.news == news
 
 
 def test_anonymous_user_cannot_post_comment(
@@ -28,13 +29,17 @@ def test_anonymous_user_cannot_post_comment(
     assert Comment.objects.count() == comment_count_before
 
 
-def test_author_can_edit_comment(author_client, news_edit_url, form_data):
+def test_author_can_edit_comment(
+        author_client, news_edit_url, form_data, comment
+):
     """Авторизованный пользователь может редактировать свои комментарии."""
     comment_count_before = Comment.objects.count()
     author_client.post(news_edit_url, data=form_data)
     assert Comment.objects.count() == comment_count_before
     edited_comment = Comment.objects.get()
     assert edited_comment.text == form_data['text']
+    assert edited_comment.author == comment.author
+    assert edited_comment.news == comment.news
 
 
 def test_non_author_cannot_edit_comment(
@@ -46,6 +51,8 @@ def test_non_author_cannot_edit_comment(
     assert Comment.objects.count() == comment_count_before
     edited_comment = Comment.objects.get()
     assert edited_comment.text == comment.text
+    assert edited_comment.author == comment.author
+    assert edited_comment.news == comment.news
 
 
 def test_author_can_delete_comment(news_delete_url, author_client):

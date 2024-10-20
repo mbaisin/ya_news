@@ -1,10 +1,12 @@
 import pytest
+from django.conf import settings
 
 from news.forms import CommentForm
-from yanews.settings import NEWS_COUNT_ON_HOME_PAGE
 
 
 pytestmark = pytest.mark.django_db
+
+item_count = settings.NEWS_COUNT_ON_HOME_PAGE
 
 
 @pytest.mark.parametrize(
@@ -36,7 +38,7 @@ def test_news_list_has_less_than_10_items(
 ):
     """Тест максимального количества новостей на стартовой странице."""
     response = author_client.get(home_url)
-    assert response.context['object_list'].count() <= NEWS_COUNT_ON_HOME_PAGE
+    assert response.context['object_list'].count() <= item_count
 
 
 def test_news_list_sorted_by_date(author_client, home_url, multiple_news):
